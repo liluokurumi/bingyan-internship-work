@@ -3,7 +3,7 @@ import time
 #制作一个主界面
 def main():
     #设置蛇的节数
-    num=10
+    num=9
     screen=pygame.display.set_mode((2000,1000))
     background=pygame.image.load('./images/background.jpg')
     pygame.display.set_caption('slither')
@@ -41,19 +41,43 @@ class SBase():
         self.image=pygame.image.load('./images/SnakeBase.png')
 # 创建一个蛇头类
 class SHead(SBase):
-# 先让蛇头往左动试试
+# 重写移动方式 注:此处为玩家蛇
     def move(self):
-        self.x+=5
+        coordinate = pygame.mouse.get_pos()
+        x1=coordinate[0]
+        y1=coordinate[1]
+        a=x1-self.x
+        b=y1-self.y
+        if a>=0 and b>0:
+            c=b/(a+b)
+            d=a/(a+b)
+            self.x+=10*d
+            self.y+=10*c
+        elif a<0 and b>=0:
+            c=b/(b-a)
+            d=-a/(b-a)
+            self.x -= 10 * d
+            self.y += 10 * c
+        elif a<=0 and b<0:
+            c=-b/(-b-a)
+            d=-a/(-b-a)
+            self.x -= 10 * d
+            self.y -= 10 * c
+        elif a>0 and b<=0:
+            c=-b/(a-b)
+            d=a/(a-b)
+            self.x += 10 * d
+            self.y -= 10 * c
+        else:
+            pass
+
+
+
     def display(self):
         self.screen.blit(self.image,(self.x,self.y))
-
-
-
-
 # 创建一个蛇身类
 class SBody(SHead):
     def Bdisplay(self):
         self.x+=5
         self.screen.blit(self.image, (self.x, self.y))
-#写一个函数创建新对象使身体变长
 main()
