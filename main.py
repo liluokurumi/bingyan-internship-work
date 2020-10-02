@@ -3,7 +3,7 @@ import time
 #制作一个主界面
 def main():
     #设置蛇的节数
-    num=9
+    num=90
     screen=pygame.display.set_mode((2000,1000))
     background=pygame.image.load('./images/background.jpg')
     pygame.display.set_caption('slither')
@@ -12,13 +12,21 @@ def main():
     for item in range(1000):
         namelist.append(item)
     for i in range(num):
-        namelist[i] = SBody(screen, 1000 - i * 20, 500)
+        namelist[i] = SBody(screen, 1000 - i * 30, 500)
     while True:
         screen.blit(background,(0,0))
         MySnakeH.display()
         MySnakeH.move()
-        for i in range(num):
+        #跟着上一节蛇身的蛇身
+        for i in range(3,num):
             namelist[i].Bdisplay()
+            namelist[i].BMove(namelist[i-1])
+        #跟着蛇头那一节
+        namelist[1].Bdisplay()
+        namelist[1].Hmove()
+        #跟着第一节蛇身的那一节蛇身
+        namelist[2].Bdisplay()
+        namelist[2].BMove(namelist[1])
         pygame.display.update()
         for event in pygame.event.get():
             if event.type==pygame.QUIT:
@@ -48,6 +56,9 @@ class SHead(SBase):
         y1=coordinate[1]
         a=x1-self.x
         b=y1-self.y
+        global Hx,Hy
+        Hx=self.x
+        Hy=self.y
         if a>=0 and b>0:
             c=b/(a+b)
             d=a/(a+b)
@@ -70,14 +81,69 @@ class SHead(SBase):
             self.y -= 10 * c
         else:
             pass
-
-
-
     def display(self):
         self.screen.blit(self.image,(self.x,self.y))
-# 创建一个蛇身类
-class SBody(SHead):
+# 创建一个蛇身类,开始尝试一节身体跟着一节身体走
+class SBody(SBase):
+    # 跟着蛇头那一节
+    def Hmove(self):
+        x1=Hx
+        y1=Hy
+        a = x1 - self.x
+        b = y1 - self.y
+        if a>=0 and b>0:
+            c=b/(a+b)
+            d=a/(a+b)
+            self.x+=10*d
+            self.y+=10*c
+        elif a<0 and b>=0:
+            c=b/(b-a)
+            d=-a/(b-a)
+            self.x -= 10 * d
+            self.y += 10 * c
+        elif a<=0 and b<0:
+            c=-b/(-b-a)
+            d=-a/(-b-a)
+            self.x -= 10 * d
+            self.y -= 10 * c
+        elif a>0 and b<=0:
+            c=-b/(a-b)
+            d=a/(a-b)
+            self.x += 10 * d
+            self.y -= 10 * c
+        else:
+            pass
+    # 跟着前一节的蛇身
+    def BMove(self,last):
+        x1=last.x
+        y1=last.y
+        a = x1 - self.x
+        b = y1 - self.y
+        if a >= 0 and b > 0:
+            c = b / (a + b)
+            d = a / (a + b)
+            self.x += 10 * d
+            self.y += 10 * c
+        elif a < 0 and b >= 0:
+            c = b / (b - a)
+            d = -a / (b - a)
+            self.x -= 10 * d
+            self.y += 10 * c
+        elif a <= 0 and b < 0:
+            c = -b / (-b - a)
+            d = -a / (-b - a)
+            self.x -= 10 * d
+            self.y -= 10 * c
+        elif a > 0 and b <= 0:
+            c = -b / (a - b)
+            d = a / (a - b)
+            self.x += 10 * d
+            self.y -= 10 * c
+        else:
+            pass
+
+
+
     def Bdisplay(self):
-        self.x+=5
         self.screen.blit(self.image, (self.x, self.y))
 main()
