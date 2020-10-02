@@ -3,7 +3,7 @@ import time
 #制作一个主界面
 def main():
     #设置蛇的节数
-    num=90
+    num=30
     screen=pygame.display.set_mode((2000,1000))
     background=pygame.image.load('./images/background.jpg')
     pygame.display.set_caption('slither')
@@ -54,32 +54,36 @@ class SHead(SBase):
         coordinate = pygame.mouse.get_pos()
         x1=coordinate[0]
         y1=coordinate[1]
-        a=x1-self.x
-        b=y1-self.y
+        at=x1-self.x
+        bt=y1-self.y
         global Hx,Hy
         Hx=self.x
         Hy=self.y
-        if a>=0 and b>0:
-            c=b/(a+b)
-            d=a/(a+b)
+        #定义一个鼠标与蛇头的直线距离,小于一个值按原方向移动,免得出现蛇停止的情况
+        lengthT=(at**2+bt**2)**0.5
+        if lengthT>=100 or lengthT<=-100:
+            global c,d
+            a = x1 - self.x
+            b = y1 - self.y
+            if a>=0 and b>0:
+                c=b/(a+b)
+                d=a/(a+b)
+            elif a<0 and b>=0:
+                c=b/(b-a)
+                d=a/(b-a)
+            elif a<=0 and b<0:
+                c=b/(-b-a)
+                d=a/(-b-a)
+            elif a>0 and b<=0:
+                c=b/(a-b)
+                d=a/(a-b)
+            else:
+                pass
             self.x+=10*d
             self.y+=10*c
-        elif a<0 and b>=0:
-            c=b/(b-a)
-            d=-a/(b-a)
-            self.x -= 10 * d
-            self.y += 10 * c
-        elif a<=0 and b<0:
-            c=-b/(-b-a)
-            d=-a/(-b-a)
-            self.x -= 10 * d
-            self.y -= 10 * c
-        elif a>0 and b<=0:
-            c=-b/(a-b)
-            d=a/(a-b)
-            self.x += 10 * d
-            self.y -= 10 * c
         else:
+            self.x += 10 * d
+            self.y += 10 * c
             pass
     def display(self):
         self.screen.blit(self.image,(self.x,self.y))
@@ -117,30 +121,39 @@ class SBody(SBase):
     def BMove(self,last):
         x1=last.x
         y1=last.y
-        a = x1 - self.x
-        b = y1 - self.y
-        if a >= 0 and b > 0:
-            c = b / (a + b)
-            d = a / (a + b)
-            self.x += 10 * d
-            self.y += 10 * c
-        elif a < 0 and b >= 0:
-            c = b / (b - a)
-            d = -a / (b - a)
-            self.x -= 10 * d
-            self.y += 10 * c
-        elif a <= 0 and b < 0:
-            c = -b / (-b - a)
-            d = -a / (-b - a)
-            self.x -= 10 * d
-            self.y -= 10 * c
-        elif a > 0 and b <= 0:
-            c = -b / (a - b)
-            d = a / (a - b)
-            self.x += 10 * d
-            self.y -= 10 * c
+        at = x1 - self.x
+        bt = y1 - self.y
+        #计算直线长度
+        lengthT=(at**2+bt**2)**0.5
+        if lengthT<=20:
+            a=at
+            b=bt
         else:
-            pass
+            a = x1 - self.x
+            b = y1 - self.y
+            if a >= 0 and b > 0:
+                c = b / (a + b)
+                d = a / (a + b)
+                self.x += 10 * d
+                self.y += 10 * c
+            elif a < 0 and b >= 0:
+                c = b / (b - a)
+                d = -a / (b - a)
+                self.x -= 10 * d
+                self.y += 10 * c
+            elif a <= 0 and b < 0:
+                c = -b / (-b - a)
+                d = -a / (-b - a)
+                self.x -= 10 * d
+                self.y -= 10 * c
+            elif a > 0 and b <= 0:
+                c = -b / (a - b)
+                d = a / (a - b)
+                self.x += 10 * d
+                self.y -= 10 * c
+            else:
+                pass
+
 
 
 
